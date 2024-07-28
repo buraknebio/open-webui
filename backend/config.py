@@ -83,7 +83,7 @@ if WEBUI_NAME != "Open WebUI":
 
 WEBUI_URL = os.environ.get("WEBUI_URL", "http://localhost:3000")
 
-WEBUI_FAVICON_URL = "https://openwebui.com/favicon.png"
+WEBUI_FAVICON_URL = "https://scontent.fsaw1-12.fna.fbcdn.net/v/t39.30808-6/424759392_794700226016849_2532948680573933151_n.jpg?_nc_cat=1&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=djJyn6v3dQoQ7kNvgEa5p0V&_nc_ht=scontent.fsaw1-12.fna&oh=00_AYAedOQTfkwrjse7yBNFSSpGKVz_bJls2vccOvpXHOWpAA&oe=66A6CC9C"
 
 
 ####################################
