@@ -138,7 +138,6 @@ async def speech(request: Request, user=Depends(get_verified_user)):
             return FileResponse(file_path)
 
         headers = {}
-        headers["Authorization"] = f"Bearer {app.state.config.OPENAI_API_KEYS[idx]}"
         headers["Content-Type"] = "application/json"
         if "openrouter.ai" in app.state.config.OPENAI_API_BASE_URLS[idx]:
             headers["HTTP-Referer"] = "https://openwebui.com/"
@@ -187,9 +186,8 @@ async def speech(request: Request, user=Depends(get_verified_user)):
 async def fetch_url(url, key):
     timeout = aiohttp.ClientTimeout(total=5)
     try:
-        headers = {"Authorization": f"Bearer {key}"}
         async with aiohttp.ClientSession(timeout=timeout, trust_env=True) as session:
-            async with session.get(url, headers=headers) as response:
+            async with session.get(url) as response:
                 return await response.json()
     except Exception as e:
         # Handle connection error here
@@ -318,7 +316,6 @@ async def get_models(url_idx: Optional[int] = None, user=Depends(get_verified_us
         key = app.state.config.OPENAI_API_KEYS[url_idx]
 
         headers = {}
-        headers["Authorization"] = f"Bearer {key}"
         headers["Content-Type"] = "application/json"
 
         r = None
@@ -395,7 +392,6 @@ async def generate_chat_completion(
     key = app.state.config.OPENAI_API_KEYS[idx]
 
     headers = {}
-    headers["Authorization"] = f"Bearer {key}"
     headers["Content-Type"] = "application/json"
     if "openrouter.ai" in app.state.config.OPENAI_API_BASE_URLS[idx]:
         headers["HTTP-Referer"] = "https://openwebui.com/"
@@ -463,7 +459,6 @@ async def proxy(path: str, request: Request, user=Depends(get_verified_user)):
     target_url = f"{url}/{path}"
 
     headers = {}
-    headers["Authorization"] = f"Bearer {key}"
     headers["Content-Type"] = "application/json"
 
     r = None
