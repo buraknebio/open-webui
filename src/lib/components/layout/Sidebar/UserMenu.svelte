@@ -9,6 +9,9 @@
 	import { fade, slide } from 'svelte/transition';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 
+  import { WEBUI_BASE_URL } from '$lib/constants'; // Import the base URL
+  import { config } from '$lib/stores'; // Import config store
+
 	const i18n = getContext('i18n');
 
 	export let show = false;
@@ -138,11 +141,36 @@
 
 			<button
 				class="flex rounded-md py-2 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-				on:click={() => {
-					localStorage.removeItem('token');
-					location.href = '/auth';
-					show = false;
-				}}
+				on:click={async () => {
+        try {
+          // Logout from OAuth2-proxy
+          const proxyLogoutResponse = await fetch(`${WEBUI_BASE_URL}/oauth2/sign_out`, {
+            method: 'GET',
+            credentials: 'include'  // I guess its important for cookies
+          });
+
+          if (!proxyLogoutResponse.ok) {
+            throw new Error(`OAuth2-proxy logout failed: ${proxyLogoutResponse.status}`);
+          }
+
+          // Conditionally logout from Keycloak (no need?)
+          if ($config?.oauth?.providers?.oidc) {
+            const keycloakLogoutUrl = `${process.env['KEYCLOAK_SERVER']}/auth/realms/${process.env['KEYCLOAK_REALM']}/protocol/openid-connect/logout?redirect_uri=${WEBUI_BASE_URL}/auth`;
+            window.location.href = keycloakLogoutUrl;
+          } else {
+            // Redirect to OpenWebUI auth route
+            location.href = `${WEBUI_BASE_URL}/auth`; 
+          }
+
+        } catch (error) {
+          console.error('Error during logout:', error);
+          // Handle error
+        } finally {
+          // Clear client-side token
+          localStorage.removeItem('token');
+          show = false; // Close the dropdown
+        }
+      }}
 			>
 				<div class=" self-center mr-3">
 					<svg
@@ -171,7 +199,7 @@
 
 				<Tooltip
 					content={$USAGE_POOL && $USAGE_POOL.length > 0
-						? `${$i18n.t('Running')}: ${$USAGE_POOL.join(', ')} ✨`
+						? `${$i18n.t('Running')}: ${$USAGE_POOL.join(', ')} ✨` 
 						: ''}
 				>
 					<div class="flex rounded-md py-1.5 px-3 text-xs gap-2.5 items-center">
