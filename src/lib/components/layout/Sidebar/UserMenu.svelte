@@ -141,36 +141,11 @@
 
 			<button
 				class="flex rounded-md py-2 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-				on:click={async () => {
-        try {
-          // Logout from OAuth2-proxy
-          const proxyLogoutResponse = await fetch(`${WEBUI_BASE_URL}/oauth2/sign_out`, {
-            method: 'GET',
-            credentials: 'include'  // I guess its important for cookies
-          });
-
-          if (!proxyLogoutResponse.ok) {
-            throw new Error(`OAuth2-proxy logout failed: ${proxyLogoutResponse.status}`);
-          }
-
-          // Conditionally logout from Keycloak (no need?)
-          if ($config?.oauth?.providers?.oidc) {
-            const keycloakLogoutUrl = `${process.env['KEYCLOAK_SERVER']}/auth/realms/${process.env['KEYCLOAK_REALM']}/protocol/openid-connect/logout?redirect_uri=${WEBUI_BASE_URL}/auth`;
-            window.location.href = keycloakLogoutUrl;
-          } else {
-            // Redirect to OpenWebUI auth route
-            location.href = `${WEBUI_BASE_URL}/auth`; 
-          }
-
-        } catch (error) {
-          console.error('Error during logout:', error);
-          // Handle error
-        } finally {
-          // Clear client-side token
-          localStorage.removeItem('token');
-          show = false; // Close the dropdown
-        }
-      }}
+				on:click={() => {
+					localStorage.removeItem('token');
+					location.href = '/auth';
+					show = false;
+				}}
 			>
 				<div class=" self-center mr-3">
 					<svg
