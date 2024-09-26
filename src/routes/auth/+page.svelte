@@ -88,11 +88,16 @@
 		if ($user !== undefined) {
 			await goto('/');
 		}
-		await checkOauthCallback();
-		loaded = true;
-		if (($config?.features.auth_trusted_header ?? false) || $config?.features.auth === false) {
-			await signInHandler();
-		}
+		        // Check if login form is disabled and OIDC is enabled
+    if ($config?.features.enable_login_form === false && 
+        $config?.oauth?.providers?.oidc) 
+    {
+        window.location.href = `${WEBUI_BASE_URL}/oauth/oidc/login`; 
+        return; // Stop further execution if redirect happens
+    }
+    // Proceed with normal logic if the login form is enabled or OIDC is not configured
+    await checkOauthCallback(); 
+    loaded = true; 
 	});
 </script>
 
